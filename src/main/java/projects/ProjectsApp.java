@@ -13,12 +13,15 @@ public class ProjectsApp {
 //A3. Imported Scanner to get input from console	
 	private ProjectService projectService = new ProjectService();
 //B1 created projectService class in the ProjectService.java	
+	private Project curProject;
            
 //A1.Cleanup. Deleted the debugging line (DbConnection.getConnection();) in the main method.  Removed the import statement: import projects.dao.DbConnection;
     
 // @formatter:off
     private List<String> operations = List.of(
-      "1) Add a project"
+      "1) Add a project",
+      "2) List projects",
+      "3) Select a project"
     );
 // @formatter:on
 //A2.Created a list to hold the variables.  List of is to create immutable list. 
@@ -49,6 +52,14 @@ public class ProjectsApp {
 		    createProject();
 		    break;
 		    
+		  case 2:
+	            listProjects();
+	            break;  
+	            
+		  case 3:
+	            selectProject();
+	            break;       
+		    
 		  default:
 		    System.out.println("\n" + selection + " is not valid selection. Try again.");
 		    break;
@@ -63,6 +74,30 @@ public class ProjectsApp {
 //A12 Created a method exit menu for that case and for the other case another method was created	
 //A13 test code	
 	
+	private void selectProject() {
+	   listProjects();
+	   Integer projectId = getIntInput("Enter a project ID to select a project");
+//D1Created a method that allows the user to select a "current" project. 
+//The current project is one on which you can add materials, steps, and categories.	   
+//D2 Print a list of projects. Collect ID
+	   curProject = null;
+//Unselects the current project.	   
+	   curProject = projectService.fetchProjectById(projectId);
+//will throw exception if invalid project ID is entered	   
+	}
+
+
+	private void listProjects() {
+    List<Project> projects = projectService.fetchAllProjects();
+
+    System.out.println("\nProjects:");
+
+    projects.forEach(project -> System.out
+        .println("   " + project.getProjectId() + ": " + project.getProjectName()));
+  }
+//C1 Created a  method calls the project service to retrieve list of projects
+//It then uses a Lambda expression to print the project IDs and names on the console
+
 	private void createProject() {
 //B2 create a method to gather project details from user
 		String projectName = getStringInput("Enter the project name");
@@ -154,5 +189,16 @@ private void printOperations() {
   
   operations.forEach(line -> System.out.println("  " + line));
 //A9 used the lambda expression		
+  
+  if(Objects.isNull(curProject)) {
+      System.out.println("\nYou are not working with a project.");
+    }
+    else {
+      System.out.println("\nYou are working with project: " + curProject);
+//D4 added code to print the current project when the available menu selections are displayed to the user. 
+// check if curProject is null. If null, print a message: "\nYou are not working with a project.". 
+//Or print the message: "\nYou are working with project: " + curProject.      
+      
+     }
 	} 
    }
