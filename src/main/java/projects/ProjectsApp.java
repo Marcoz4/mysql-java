@@ -21,7 +21,9 @@ public class ProjectsApp {
     private List<String> operations = List.of(
       "1) Add a project",
       "2) List projects",
-      "3) Select a project"
+      "3) Select a project",
+      "4) Update project details",
+      "5) Delete a project"
     );
 // @formatter:on
 //A2.Created a list to hold the variables.  List of is to create immutable list. 
@@ -58,6 +60,14 @@ public class ProjectsApp {
 	            
 		  case 3:
 	            selectProject();
+	            break;   
+	            
+		  case 4:
+	            updateProjectDetails();
+	            break;    
+	            
+		  case 5:
+	            deleteProject();
 	            break;       
 		    
 		  default:
@@ -74,6 +84,70 @@ public class ProjectsApp {
 //A12 Created a method exit menu for that case and for the other case another method was created	
 //A13 test code	
 	
+	  private void deleteProject() {
+    listProjects();
+
+    Integer projectId = getIntInput("Enter the ID of the project to delete");
+
+    projectService.deleteProject(projectId);
+    System.out.println("Project " + projectId + " was deleted successfully.");
+  
+    if(Objects.nonNull(curProject) && curProject.getProjectId().equals(projectId)) {
+      curProject = null;
+    }
+	}
+//F1. Created a method that deletes a project and all project child records.
+//If the user enters a project ID that is not in the project table, the service throws an exception.
+
+
+	private void updateProjectDetails() {
+		if(Objects.isNull(curProject)) {
+		      System.out.println("\nPlease select a project.");
+		      return;
+//E1.Created a new method to let select the project. If no current project selected will return to menu
+		   }
+		
+	    String projectName =
+		        getStringInput("Enter the project name [" + curProject.getProjectName() + "]");
+
+	    BigDecimal estimatedHours =
+		        getDecimalInput("Enter the estimated hours [" + curProject.getEstimatedHours() + "]");
+
+		BigDecimal actualHours =
+		        getDecimalInput("Enter the actual hours + [" + curProject.getActualHours() + "]");
+
+		Integer difficulty =
+		        getIntInput("Enter the project difficulty (1-5) [" + curProject.getDifficulty() + "]");
+
+		String notes = getStringInput("Enter the project notes [" + curProject.getNotes() + "]");
+//E2. Collecting input from the user. 
+//If the user presses Enter without entering a value it will be null.		
+		
+		Project project = new Project();
+
+	    project.setProjectId(curProject.getProjectId());
+	    project.setProjectName(Objects.isNull(projectName) ? curProject.getProjectName() : projectName);
+
+	    project.setEstimatedHours(
+	        Objects.isNull(estimatedHours) ? curProject.getEstimatedHours() : estimatedHours);
+
+	    project.setActualHours(Objects.isNull(actualHours) ? curProject.getActualHours() : actualHours);
+	    project.setDifficulty(Objects.isNull(difficulty) ? curProject.getDifficulty() : difficulty);
+	    project.setNotes(Objects.isNull(notes) ? curProject.getNotes() : notes);
+//E3.create and populate a Project object using users input.
+//If user didn't put input value will be to what the selected project is
+	    
+	    projectService.modifyProjectDetails(project);
+//E4. Call the project service to update the project details.
+	    curProject = projectService.fetchProjectById(curProject.getProjectId());
+//E5. Will display the new details.
+		
+		
+		
+		
+	}
+
+
 	private void selectProject() {
 	   listProjects();
 	   Integer projectId = getIntInput("Enter a project ID to select a project");
